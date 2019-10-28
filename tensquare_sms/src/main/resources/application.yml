@@ -1,0 +1,14 @@
+server:
+  port: 9009
+spring:
+  application:
+    name: tensquare-sms
+  rabbitmq:
+    host: 192.168.145.128
+
+aliyun:
+  sms:
+    accessKeyId: LTAI4FvRgAgEEZuh1xNSVXMU
+    accessKeySecret: MO02nj9seukNscestV8StSLA83R8w5
+    template_code: SMS_176531454
+    sign_name: 十次方小项目的短信测试

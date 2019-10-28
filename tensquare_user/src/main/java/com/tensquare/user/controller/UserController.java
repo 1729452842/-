@@ -6,6 +6,7 @@ import entity.Result;
 import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,13 +23,34 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private RedisTemplate redisTemplate;
+
 	/**
-	 * 发送短信验证码
+	 * 发送短信验证码 561167
 	 */
-	@RequestMapping(value = "/sendsms/{mobbile}",method = RequestMethod.POST)
-	public Result sendSms(@PathVariable String mobbile){
-		userService.sendSms(mobbile);
+	@RequestMapping(value = "/sendsms/{mobile}",method = RequestMethod.POST)
+	public Result sendSms(@PathVariable String mobile){
+		userService.sendSms(mobile);
 		return new Result(true,StatusCode.OK,"发送成功");
+	}
+
+	/**
+	 * 用户注册
+	 */
+	@RequestMapping(value = "/register/{code}",method = RequestMethod.POST)
+	public Result regist(@PathVariable String code,@RequestBody User user){
+
+		String  checkCodeRedis = (String) redisTemplate.opsForValue().get("checkCode_" + user.getMobile());
+
+		if(checkCodeRedis.isEmpty()){
+			return new Result(false, StatusCode.ERROR, "请先获取手机验证码");
+		}
+		if (!checkCodeRedis.equals(code)) {
+			return new Result(false, StatusCode.ERROR, "验证码错误，请输入正确的验证码");
+		}
+		userService.add(user);
+		return new Result(true,StatusCode.OK,"注册成功");
 	}
 	
 	/**
