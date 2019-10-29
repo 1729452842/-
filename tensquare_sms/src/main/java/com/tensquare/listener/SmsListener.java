@@ -1,6 +1,5 @@
 package com.tensquare.listener;
 
-import com.aliyuncs.exceptions.ClientException;
 import com.tensquare.utils.SmsUtil;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -17,21 +16,17 @@ public class SmsListener {
     @Autowired
     private SmsUtil smsUtil;
 
-    @Value("{aliyun.sms.template_code}")
+    @Value("${aliyun.sms.template_code}")
     private String template_code;
 
-    @Value("{aliyun.sms.sign_name}")
+    @Value("${aliyun.sms.sign_name}")
     private String sign_name;
 
     @RabbitHandler
     public void executeSms(Map<String, String> map)  {
         String moblie = map.get("mobile");
         String checkCode = map.get("checkCode");
-        try {
-            smsUtil.sendSms(moblie,template_code,sign_name,"{\"checkCode\":\""+checkCode+"\"}");
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
+        smsUtil.sendSms(moblie,sign_name,template_code,"{\"checkCode\":\""+ checkCode +"\"}");
         System.out.println("手机号："+ map.get("mobile"));
         System.out.println("验证码："+ map.get("checkCode"));
     }
